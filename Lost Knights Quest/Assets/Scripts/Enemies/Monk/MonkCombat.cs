@@ -63,21 +63,17 @@ public class MonkCombat : MonoBehaviour, ICombat
         
         if(Time.time >= timeOfPreformingAttack + 1.5)
         {
-            Debug.Log("choosing combination");
             switch (randNum)
             {
                 case 0:
-                    Debug.Log("calling combo 1");
                     timeOfComboStart = Time.time;
                     combo1 = true;
                     break;
                 case 1:
-                    Debug.Log("calling combo 2");
                     timeOfComboStart = Time.time;
                     combo2 = true;
                     break;
                 case 2:
-                    Debug.Log("calling combo 3");
                     timeOfComboStart = Time.time;
                     combo3 = true;
                     break;
@@ -106,7 +102,6 @@ public class MonkCombat : MonoBehaviour, ICombat
         }
         else if (combo1 == true && comboAction == 3 && Time.time >= timeOfPreformingAttack + 0.6)
         {
-            Debug.Log("Prekini Kombo");
             inCombo = false;
             combo1 = false;
             comboAction = 0;
@@ -131,7 +126,6 @@ public class MonkCombat : MonoBehaviour, ICombat
         }
         else if (combo2 == true && comboAction == 3 && Time.time >= timeOfPreformingAttack + 0.6)
         {
-            Debug.Log("Prekini Kombo");
             inCombo = false;
             combo2 = false;
             comboAction = 0;
@@ -156,7 +150,6 @@ public class MonkCombat : MonoBehaviour, ICombat
         }
         else if (combo3 == true && comboAction == 3 && Time.time >= timeOfPreformingAttack + 0.6)
         {
-            Debug.Log("Prekini Kombo");
             inCombo = false;
             combo3 = false;
             comboAction = 0;
@@ -166,19 +159,16 @@ public class MonkCombat : MonoBehaviour, ICombat
     public void Punch()
     {
         timeOfPreformingAttack = Time.time;
-        Debug.Log("punch");
         animator.SetTrigger("Punch");
     }
     public void Kick()
     {
         timeOfPreformingAttack = Time.time;
-        Debug.Log("Kick");
         animator.SetTrigger("Kick");
     }
     public void LowKick()
     {
         timeOfPreformingAttack = Time.time;
-        Debug.Log("LowKick");
         animator.SetTrigger("LowKick");
     }
 
