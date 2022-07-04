@@ -84,7 +84,6 @@ public class SpearCombat : MonoBehaviour , ICombat
     public void Attack()
     {
         canAttackNoDash = false;
-        Debug.Log("Attack");
         animator.SetTrigger("Attack");
         addAttackPush(attackPushStrenght);
     }

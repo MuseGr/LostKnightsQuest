@@ -222,6 +222,14 @@ public class CombatScript : MonoBehaviour
         GetComponent<NewMovement>().ableToRoll = true;
         GetComponent<NewMovement>().canRoll = true;
     }
+
+    public void UnblockableAttack(int dmg)
+    {
+        currentHealth -= dmg;
+        animator.SetTrigger("Hurt");
+
+        healthBar.SetHealth(currentHealth);
+    }
     public void TakeDamage(int dmg)
     {
         if (!isBlocking)
@@ -232,8 +240,7 @@ public class CombatScript : MonoBehaviour
             healthBar.SetHealth(currentHealth);
         }
         else
-        {
-            Debug.Log("Block");
+        { 
             animator.SetTrigger("Block");
 
             GameObject.Find("Monk").GetComponent<MonkCombat>().ResetAttackTimer();
@@ -252,9 +259,11 @@ public class CombatScript : MonoBehaviour
 
         healthBar.SetHealth(currentHealth);
     }
-    void Die()
+    public void Die()
     {
         animator.SetBool("isDead", true);
+
+        DeathScreen.instance.Show();
 
         rb.velocity = Vector2.zero;
         GetComponent<NewMovement>().enabled = false;

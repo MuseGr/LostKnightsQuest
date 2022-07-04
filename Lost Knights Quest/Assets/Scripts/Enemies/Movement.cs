@@ -23,24 +23,34 @@ public class Movement : MonoBehaviour
     public float stopMovementAt;   //2.5
     public bool changingDirection => (rb.velocity.x > 0f && movementDir < 0f) || (rb.velocity.x < 0f && movementDir > 0f);
 
+    public bool shouldMoveAway = false;
 
     //IsAbble
     bool isAbleToDash = false;
     bool isAbbleToRun = false;
 
+    public bool facingLeft = false;
+
+    bool movementEnabled = true;
+
     void FixedUpdate()
     {
-        checkForAlert();
+        if(movementEnabled)
+            checkForAlert();
         CheckIfShouldRun();
         CheckForMovementDir();
         FlippSpriteWhenChangingDir();
         FlippSpriteBasedOnPlayerPossiton();
         ApplyLinearDrag();
         counterPushing();
+        MoveAwayFromPlayer();
     }
 
     private void checkForAlert()
     {
+        if (shouldMoveAway)
+            return;
+
         if (transform.position.x - player.transform.position.x <= alertRange)
         {
             isAlert = true;
@@ -54,11 +64,13 @@ public class Movement : MonoBehaviour
     }
     private void CheckForMovementDir()
     {
+        if (shouldMoveAway)
+            return;
+
         if (player.transform.position.x + stopMovementAt < transform.position.x)
         {
             movementDir = -1f;
             triggerAttack = false;
-
         }
         else if (player.transform.position.x - stopMovementAt > transform.position.x)
         {
@@ -82,7 +94,7 @@ public class Movement : MonoBehaviour
 
     private void FlippSpriteWhenChangingDir()
     {
-        switch (movementDir)
+        switch (movementDir * ((facingLeft)?-1:1))
         {
             case 1f:
                 sp.flipX = false;
@@ -94,7 +106,7 @@ public class Movement : MonoBehaviour
     }
     private void FlippSpriteBasedOnPlayerPossiton()
     {
-        if(player.transform.position.x > transform.position.x)
+        if((player.transform.position.x - transform.position.x) * ((facingLeft)?-1:1) > 0)
         {
             sp.flipX = false;
         }
@@ -106,6 +118,9 @@ public class Movement : MonoBehaviour
 
     private void CheckIfShouldRun()
     {
+        if (shouldMoveAway)
+            return;
+
         if (isAlert && isAbbleToRun)
         {
             Run();
@@ -143,12 +158,10 @@ public class Movement : MonoBehaviour
         {
             if (transform.position.x - player.transform.position.x < 1)
             {
-                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionX;
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             }
             else
             {
-                rb.constraints = RigidbodyConstraints2D.None;
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
         }
@@ -156,13 +169,56 @@ public class Movement : MonoBehaviour
         {
             if (player.transform.position.x - transform.position.x < 1)
             {
-                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionX;
+                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             }
             else
             {
-                rb.constraints = RigidbodyConstraints2D.None;
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
         }
+    }
+
+    public void MoveAwayFromPlayer()
+    {
+        if (shouldMoveAway)
+        {
+            if(player.transform.position.x > transform.position.x)
+            {
+                movementDir = -1;
+            }
+            else
+            {
+                movementDir = 1;
+                sp.flipX = true;
+            }
+
+            animator.SetFloat("Speed", Mathf.Abs(movementDir));
+            if (rb.velocity.x < maxMovemetnSepeed && rb.velocity.x > -maxMovemetnSepeed)
+            {
+                float speedDif = movementAcceleration - rb.velocity.x;
+                rb.AddForce(new Vector2(movementDir * speedDif, rb.position.y), ForceMode2D.Force);
+            }
+            var combat = GetComponent<BoDcombat>();
+
+            combat.switchDirTime += Time.deltaTime;
+
+            if(combat.switchDirTime >= 1.5)
+            {
+                shouldMoveAway = false;
+                combat.dirSwitched = false;
+                combat.shouldCastSpeel = true;
+            }
+        }
+    }
+
+    public void DisableMovemetn()
+    {
+        movementEnabled = false;
+        isAbbleToRun = false;
+    }
+    public void EnableMovement()
+    {
+        movementEnabled = true;
+        isAbbleToRun = true;
     }
 }

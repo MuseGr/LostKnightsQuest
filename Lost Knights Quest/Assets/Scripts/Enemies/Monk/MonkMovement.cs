@@ -8,7 +8,6 @@ public class MonkMovement : Movement
 
     private void Update()
     {
-        //return false for is in range if player is out of range
         if (player.transform.position.x + stopMovementAt < transform.position.x)
         {
             combatScript.isInRange = false;
